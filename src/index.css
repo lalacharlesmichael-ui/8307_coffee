@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-heading: 'Outfit', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+  }
+  
+  body {
+    font-family: var(--font-sans);
+    background-color: #FAF5EF;
+    color: #2C1A0E;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Custom Coffee Roastery Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F3EAE1;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4A58E;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9A745A;
+}
+
+/* Custom Utilities for Thermal Receipt Print */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #thermal-receipt, #thermal-receipt * {
+    visibility: visible;
+  }
+  #thermal-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0 auto;
+    padding: 10px;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: monospace;
+    font-size: 12px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Glassmorphism subtle effect */
+.glass-panel {
+  background: rgba(255, 253, 249, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.coffee-gradient {
+  background: linear-gradient(135deg, #3D2314 0%, #2A180D 100%);
+}
+
+.amber-gradient {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.cream-card {
+  background-color: #FFFDF9;
+  border: 1px solid #EFE4D6;
+}
+
+/* Active touch feedback */
+.touch-press {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.touch-press:active {
+  transform: scale(0.97);
+}
