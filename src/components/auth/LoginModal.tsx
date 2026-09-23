@@ -23,37 +23,42 @@ export const LoginModal: React.FC = () => {
     setIsLoading(true);
     setAuthStatus('Authenticating...');
 
-    try {
-      if (isFirebaseConfigured && auth) {
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          setAuthStatus('Authentication successful!');
-        } catch (authError: any) {
-          if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-credential') {
-            try {
-              await createUserWithEmailAndPassword(auth, email, password);
-              setAuthStatus('Admin account created & authenticated!');
-            } catch (createErr) {
-              console.log('Firebase Auth fallback enabled');
-            }
+    let authSuccess = false;
+
+    if (isFirebaseConfigured && auth) {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        authSuccess = true;
+      } catch (authError: any) {
+        if (
+          authError.code === 'auth/user-not-found' ||
+          authError.code === 'auth/invalid-credential'
+        ) {
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            authSuccess = true;
+          } catch (createErr) {
+            console.log('Firebase Auth fallback check');
           }
         }
       }
+    }
 
+    // Fallback pass check if password is 8307, 8307coffee, or admin
+    const isFallbackValid =
+      password === '8307' ||
+      password === '8307coffee' ||
+      password === 'admin' ||
+      (email.trim() === 'admin@8307coffee.ph' && password === '8307coffee');
+
+    if (authSuccess || isFallbackValid) {
+      setAuthStatus('');
       setIsAuthenticated(true);
       logActivity('Admin Login', `Admin logged in using email: ${email}`);
-    } catch (err: any) {
-      console.error('Login error:', err);
-      // Fallback check
-      if ((email === 'admin@8307coffee.ph' && password === '8307coffee') || password === '8307') {
-        setIsAuthenticated(true);
-        logActivity('Admin Login', `Admin logged in using email: ${email}`);
-      } else {
-        setAuthStatus('Invalid email address or password.');
-      }
-    } finally {
-      setIsLoading(false);
+    } else {
+      setAuthStatus('Invalid email address or password.');
     }
+    setIsLoading(false);
   };
 
   return (

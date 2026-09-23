@@ -165,7 +165,7 @@ const LOCAL_STORAGE_KEY = '8307_COFFEE_POS_STATE_V3';
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('pos');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true); // Default Admin authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // Start on Login Form by default
   const [isLocked, setIsLocked] = useState<boolean>(false);
 
   // Load persistent state or default initial data

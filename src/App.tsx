@@ -13,7 +13,7 @@ import { CustomersView } from './components/customers/CustomersView';
 import { SettingsView } from './components/settings/SettingsView';
 
 const MainAppContent: React.FC = () => {
-  const { activeTab } = useStore();
+  const { activeTab, isAuthenticated } = useStore();
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -40,8 +40,12 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF5EF] text-[#2C1A0E] flex flex-col antialiased selection:bg-[#D97706] selection:text-white">
-      <Navbar />
-      <main className="flex-1 overflow-x-hidden">{renderActiveTab()}</main>
+      {isAuthenticated && (
+        <>
+          <Navbar />
+          <main className="flex-1 overflow-x-hidden">{renderActiveTab()}</main>
+        </>
+      )}
 
       {/* Auth & Security Overlays */}
       <LoginModal />
