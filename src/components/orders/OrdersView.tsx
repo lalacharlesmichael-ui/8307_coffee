@@ -47,8 +47,13 @@ export const OrdersView: React.FC = () => {
     return `${elapsedMins}m ${elapsedSecs}s ago`;
   };
 
+  // Sort orders newest first
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
   // Filter orders
-  const filteredOrders = orders.filter((o) => {
+  const filteredOrders = sortedOrders.filter((o) => {
     const matchesSearch =
       o.order_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (o.customer_name && o.customer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||

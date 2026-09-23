@@ -341,14 +341,78 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
     });
 
-    // Listen to Orders in Firestore
+    // Listen to Orders in Firestore (sorted newest-first)
     const unsubOrders = onSnapshot(collection(db, COLLECTIONS.ORDERS), (snapshot) => {
       if (!snapshot.empty) {
         const firestoreOrders: Order[] = [];
         snapshot.forEach((docSnap) => {
           firestoreOrders.push({ ...docSnap.data(), id: docSnap.id } as Order);
         });
+        firestoreOrders.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
         setOrders(firestoreOrders);
+      }
+    });
+
+    // Listen to Inventory in Firestore
+    const unsubInv = onSnapshot(collection(db, COLLECTIONS.INVENTORY), (snapshot) => {
+      if (!snapshot.empty) {
+        const items: InventoryItem[] = [];
+        snapshot.forEach((docSnap) => {
+          items.push({ ...docSnap.data(), id: docSnap.id } as InventoryItem);
+        });
+        setInventory(items);
+      }
+    });
+
+    // Listen to Expenses in Firestore
+    const unsubExpenses = onSnapshot(collection(db, COLLECTIONS.EXPENSES), (snapshot) => {
+      if (!snapshot.empty) {
+        const exps: Expense[] = [];
+        snapshot.forEach((docSnap) => {
+          exps.push({ ...docSnap.data(), id: docSnap.id } as Expense);
+        });
+        exps.sort(
+          (a, b) => new Date(b.created_at || b.expense_date).getTime() - new Date(a.created_at || a.expense_date).getTime()
+        );
+        setExpenses(exps);
+      }
+    });
+
+    // Listen to Customers in Firestore
+    const unsubCustomers = onSnapshot(collection(db, COLLECTIONS.CUSTOMERS), (snapshot) => {
+      if (!snapshot.empty) {
+        const custs: Customer[] = [];
+        snapshot.forEach((docSnap) => {
+          custs.push({ ...docSnap.data(), id: docSnap.id } as Customer);
+        });
+        setCustomers(custs);
+      }
+    });
+
+    // Listen to Settings in Firestore
+    const unsubSettings = onSnapshot(collection(db, COLLECTIONS.SETTINGS), (snapshot) => {
+      if (!snapshot.empty) {
+        snapshot.forEach((docSnap) => {
+          if (docSnap.id === 'store_profile') {
+            setSettings(docSnap.data() as ShopSettings);
+          }
+        });
+      }
+    });
+
+    // Listen to Activity Logs in Firestore
+    const unsubLogs = onSnapshot(collection(db, COLLECTIONS.LOGS), (snapshot) => {
+      if (!snapshot.empty) {
+        const logs: ActivityLog[] = [];
+        snapshot.forEach((docSnap) => {
+          logs.push({ ...docSnap.data(), id: docSnap.id } as ActivityLog);
+        });
+        logs.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setActivityLogs(logs);
       }
     });
 
@@ -356,6 +420,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       unsubProducts();
       unsubCats();
       unsubOrders();
+      unsubInv();
+      unsubExpenses();
+      unsubCustomers();
+      unsubSettings();
+      unsubLogs();
     };
   }, []);
 
@@ -627,7 +696,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const totalAmount = Math.round((discountedSubtotal + taxAmount + serviceCharge) * 100) / 100;
 
     const changeGiven = Math.max(0, amountPaid - totalAmount);
-    const nextSeqNumber = orders.length + 1;
+    const existingNums = orders.map((o) => {
+      const match = o.order_number?.match(/ORD-8307-(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
+    const maxNum = existingNums.length > 0 ? Math.max(...existingNums, 0) : 0;
+    const nextSeqNumber = maxNum + 1;
     const orderNumStr = String(nextSeqNumber).padStart(3, '0');
     const orderNumber = `ORD-8307-${orderNumStr}`;
 

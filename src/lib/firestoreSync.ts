@@ -27,12 +27,17 @@ export const COLLECTIONS = {
   SETTINGS: 'settings',
 };
 
+// Helper to recursively strip undefined properties so Firestore setDoc does not throw invalid data error
+const cleanData = <T>(obj: T): T => {
+  return JSON.parse(JSON.stringify(obj));
+};
+
 // Insert or update Order in Firestore
 export const syncOrderToFirestore = async (order: Order) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.ORDERS, order.id);
-    await setDoc(docRef, order, { merge: true });
+    await setDoc(docRef, cleanData(order), { merge: true });
     console.log(`[Firestore] Saved order ${order.order_number}`);
   } catch (error) {
     console.error('[Firestore Error] Failed to save order:', error);
@@ -44,7 +49,7 @@ export const syncProductToFirestore = async (product: Product) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.PRODUCTS, product.id);
-    await setDoc(docRef, product, { merge: true });
+    await setDoc(docRef, cleanData(product), { merge: true });
     console.log(`[Firestore] Saved product ${product.name}`);
   } catch (error) {
     console.error('[Firestore Error] Failed to save product:', error);
@@ -68,7 +73,7 @@ export const syncCategoryToFirestore = async (category: Category) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.CATEGORIES, category.id);
-    await setDoc(docRef, category, { merge: true });
+    await setDoc(docRef, cleanData(category), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save category:', error);
   }
@@ -79,7 +84,7 @@ export const syncInventoryToFirestore = async (item: InventoryItem) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.INVENTORY, item.id);
-    await setDoc(docRef, item, { merge: true });
+    await setDoc(docRef, cleanData(item), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save inventory item:', error);
   }
@@ -90,7 +95,7 @@ export const syncExpenseToFirestore = async (expense: Expense) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.EXPENSES, expense.id);
-    await setDoc(docRef, expense, { merge: true });
+    await setDoc(docRef, cleanData(expense), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save expense:', error);
   }
@@ -101,7 +106,7 @@ export const syncCustomerToFirestore = async (customer: Customer) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.CUSTOMERS, customer.id);
-    await setDoc(docRef, customer, { merge: true });
+    await setDoc(docRef, cleanData(customer), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save customer:', error);
   }
@@ -112,7 +117,7 @@ export const syncLogToFirestore = async (log: ActivityLog) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.LOGS, log.id);
-    await setDoc(docRef, log, { merge: true });
+    await setDoc(docRef, cleanData(log), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save activity log:', error);
   }
@@ -123,7 +128,7 @@ export const syncSettingsToFirestore = async (settings: ShopSettings) => {
   if (!isFirebaseConfigured) return;
   try {
     const docRef = doc(db, COLLECTIONS.SETTINGS, 'store_profile');
-    await setDoc(docRef, settings, { merge: true });
+    await setDoc(docRef, cleanData(settings), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save settings:', error);
   }
