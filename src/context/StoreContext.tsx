@@ -162,11 +162,34 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = '8307_COFFEE_POS_STATE_V3';
+const AUTH_STORAGE_KEY = '8307_COFFEE_AUTH_SESSION';
+
+// Initial state for auth session
+const initialAuth = () => {
+  try {
+    return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+  } catch (e) {
+    return false;
+  }
+};
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('pos');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // Start on Login Form by default
+  const [isAuthenticated, setIsAuthenticatedState] = useState<boolean>(initialAuth);
   const [isLocked, setIsLocked] = useState<boolean>(false);
+
+  const setIsAuthenticated = (val: boolean) => {
+    setIsAuthenticatedState(val);
+    try {
+      if (val) {
+        localStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+      }
+    } catch (e) {
+      console.error('Failed to update auth storage:', e);
+    }
+  };
 
   // Load persistent state or default initial data
   const loadInitialState = () => {
