@@ -170,7 +170,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             </label>
 
             <div className="grid grid-cols-2 gap-2">
-              {discounts.map((disc) => {
+              {discounts.filter((d) => d.is_active !== false).map((disc) => {
                 const isSelected = selectedDiscount?.id === disc.id;
                 return (
                   <button

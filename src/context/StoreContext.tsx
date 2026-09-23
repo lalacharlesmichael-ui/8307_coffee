@@ -43,6 +43,8 @@ import {
   syncCustomerToFirestore,
   syncLogToFirestore,
   syncSettingsToFirestore,
+  syncDiscountToFirestore,
+  deleteDiscountFromFirestore,
   COLLECTIONS,
 } from '../lib/firestoreSync';
 import { db, isFirebaseConfigured } from '../lib/firebase';
@@ -77,6 +79,12 @@ interface StoreContextType {
   // Category CRUD
   addCategory: (category: Omit<Category, 'id'>) => void;
   deleteCategory: (id: string) => void;
+
+  // Discount CRUD
+  addDiscount: (discount: Omit<Discount, 'id'>) => void;
+  updateDiscount: (id: string, discount: Partial<Discount>) => void;
+  deleteDiscount: (id: string) => void;
+  toggleDiscountActive: (id: string) => void;
 
   // Cart & Active Ordering
   cart: CartItem[];
@@ -416,6 +424,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
     });
 
+    // Listen to Discounts in Firestore
+    const unsubDiscounts = onSnapshot(collection(db, COLLECTIONS.DISCOUNTS), (snapshot) => {
+      if (!snapshot.empty) {
+        const firestoreDiscounts: Discount[] = [];
+        snapshot.forEach((docSnap) => {
+          firestoreDiscounts.push({ ...docSnap.data(), id: docSnap.id } as Discount);
+        });
+        setDiscounts(firestoreDiscounts);
+      }
+    });
+
     return () => {
       unsubProducts();
       unsubCats();
@@ -425,6 +444,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       unsubCustomers();
       unsubSettings();
       unsubLogs();
+      unsubDiscounts();
     };
   }, []);
 
@@ -520,6 +540,54 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((c) => c.id !== id));
     logActivity('Delete Category', `Deleted category ID: ${id}`);
+  };
+
+  // Discount CRUD
+  const addDiscount = (discData: Omit<Discount, 'id'>) => {
+    const newDisc: Discount = { ...discData, id: `disc-${Date.now()}` };
+    setDiscounts((prev) => [...prev, newDisc]);
+    syncDiscountToFirestore(newDisc);
+    logActivity('Add Discount', `Created discount/promo: ${newDisc.name}`);
+  };
+
+  const updateDiscount = (id: string, updated: Partial<Discount>) => {
+    let updatedDisc: Discount | null = null;
+    setDiscounts((prev) =>
+      prev.map((d) => {
+        if (d.id === id) {
+          updatedDisc = { ...d, ...updated };
+          return updatedDisc;
+        }
+        return d;
+      })
+    );
+    if (updatedDisc) {
+      syncDiscountToFirestore(updatedDisc);
+    }
+    logActivity('Update Discount', `Updated discount ID: ${id}`);
+  };
+
+  const deleteDiscount = (id: string) => {
+    setDiscounts((prev) => prev.filter((d) => d.id !== id));
+    deleteDiscountFromFirestore(id);
+    logActivity('Delete Discount', `Deleted discount ID: ${id}`);
+  };
+
+  const toggleDiscountActive = (id: string) => {
+    setDiscounts((prev) =>
+      prev.map((d) => {
+        if (d.id === id) {
+          const updated = { ...d, is_active: !d.is_active };
+          syncDiscountToFirestore(updated);
+          logActivity(
+            'Discount Status Change',
+            `Marked discount ${d.name} as ${updated.is_active ? 'Active' : 'Inactive'}`
+          );
+          return updated;
+        }
+        return d;
+      })
+    );
   };
 
   // Cart Operations
@@ -1053,6 +1121,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         addCategory,
         deleteCategory,
+
+        addDiscount,
+        updateDiscount,
+        deleteDiscount,
+        toggleDiscountActive,
 
         cart,
         orderType,

@@ -13,6 +13,7 @@ import type {
   Customer,
   ActivityLog,
   ShopSettings,
+  Discount,
 } from '../types/pos';
 
 // Firestore collection references
@@ -25,6 +26,7 @@ export const COLLECTIONS = {
   CUSTOMERS: 'customers',
   LOGS: 'activity_logs',
   SETTINGS: 'settings',
+  DISCOUNTS: 'discounts',
 };
 
 // Helper to recursively strip undefined properties so Firestore setDoc does not throw invalid data error
@@ -131,5 +133,29 @@ export const syncSettingsToFirestore = async (settings: ShopSettings) => {
     await setDoc(docRef, cleanData(settings), { merge: true });
   } catch (error) {
     console.error('[Firestore Error] Failed to save settings:', error);
+  }
+};
+
+// Insert or update Discount in Firestore
+export const syncDiscountToFirestore = async (discount: Discount) => {
+  if (!isFirebaseConfigured) return;
+  try {
+    const docRef = doc(db, COLLECTIONS.DISCOUNTS, discount.id);
+    await setDoc(docRef, cleanData(discount), { merge: true });
+    console.log(`[Firestore] Saved discount ${discount.name}`);
+  } catch (error) {
+    console.error('[Firestore Error] Failed to save discount:', error);
+  }
+};
+
+// Delete Discount from Firestore
+export const deleteDiscountFromFirestore = async (discountId: string) => {
+  if (!isFirebaseConfigured) return;
+  try {
+    const docRef = doc(db, COLLECTIONS.DISCOUNTS, discountId);
+    await deleteDoc(docRef);
+    console.log(`[Firestore] Deleted discount ${discountId}`);
+  } catch (error) {
+    console.error('[Firestore Error] Failed to delete discount:', error);
   }
 };
