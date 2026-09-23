@@ -211,9 +211,6 @@ export const ProductsView: React.FC = () => {
                       }}
                     />
                   ) : null}
-                  <span className="text-4xl drop-shadow absolute pointer-events-none">
-                    {prod.emoji_icon || '☕'}
-                  </span>
                   <div className="absolute top-2 right-2 z-10">
                     <button
                       onClick={() => toggleProductAvailability(prod.id)}
@@ -241,19 +238,6 @@ export const ProductsView: React.FC = () => {
                     </span>
                   </div>
                   <p className="text-xs text-[#8C5338] line-clamp-2">{prod.description}</p>
-
-                  {prod.variants && prod.variants.length > 0 && (
-                    <div className="pt-2 flex flex-wrap gap-1">
-                      {prod.variants.map((v) => (
-                        <span
-                          key={v.id}
-                          className="px-2 py-0.5 rounded-md bg-[#FAF5EF] border border-[#EFE4D6] text-[10px] text-[#6F3E28] font-medium"
-                        >
-                          {v.name} (+₱{v.price_adjustment})
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
 

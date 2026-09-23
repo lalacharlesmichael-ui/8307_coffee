@@ -2,6 +2,8 @@ import {
   doc,
   setDoc,
   deleteDoc,
+  getDocs,
+  collection,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from './firebase';
 import type {
@@ -157,5 +159,18 @@ export const deleteDiscountFromFirestore = async (discountId: string) => {
     console.log(`[Firestore] Deleted discount ${discountId}`);
   } catch (error) {
     console.error('[Firestore Error] Failed to delete discount:', error);
+  }
+};
+
+// Clear All Orders from Firestore
+export const clearAllOrdersFromFirestore = async () => {
+  if (!isFirebaseConfigured) return;
+  try {
+    const snapshot = await getDocs(collection(db, COLLECTIONS.ORDERS));
+    const deletePromises = snapshot.docs.map((docSnap) => deleteDoc(doc(db, COLLECTIONS.ORDERS, docSnap.id)));
+    await Promise.all(deletePromises);
+    console.log('[Firestore] Cleared all orders from Firestore');
+  } catch (error) {
+    console.error('[Firestore Error] Failed to clear orders:', error);
   }
 };

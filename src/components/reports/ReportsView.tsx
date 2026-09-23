@@ -18,10 +18,11 @@ import {
   PieChart as PieIcon,
   Award,
   FileSpreadsheet,
+  Trash2,
 } from 'lucide-react';
 
 export const ReportsView: React.FC = () => {
-  const { orders, expenses, products, categories } = useStore();
+  const { orders, expenses, products, categories, clearAllOrders } = useStore();
 
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year' | 'all'>('all');
 
@@ -192,6 +193,23 @@ export const ReportsView: React.FC = () => {
           >
             <FileSpreadsheet className="w-4 h-4" />
             <span>Export CSV</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (
+                confirm(
+                  'Are you sure you want to clear all sales report data and order history? This action will reset all sales reports to ₱0.00 and cannot be undone.'
+                )
+              ) {
+                clearAllOrders();
+              }
+            }}
+            className="px-3.5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-extrabold rounded-xl shadow-sm transition-all text-xs flex items-center gap-1.5 touch-press"
+            title="Clear all sales report data"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Clear Sales Data</span>
           </button>
         </div>
       </div>

@@ -437,7 +437,7 @@ export const POSView: React.FC = () => {
                         : 'hover:border-[#D97706] hover:shadow-md cursor-pointer touch-press'
                     }`}
                   >
-                    {/* Product Image / Icon Header */}
+                    {/* Product Image Header corresponding to item name */}
                     <div className="relative h-28 sm:h-32 w-full bg-[#2A180D] flex items-center justify-center overflow-hidden border-b border-[#3D2314]">
                       {prod.image_url ? (
                         <img
@@ -445,14 +445,10 @@ export const POSView: React.FC = () => {
                           alt={prod.name}
                           className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
                           onError={(e) => {
-                            // Fallback to emoji badge if image fails to load
                             (e.target as HTMLElement).style.display = 'none';
                           }}
                         />
                       ) : null}
-                      <span className="text-4xl sm:text-5xl drop-shadow-md absolute pointer-events-none">
-                        {prod.emoji_icon || '☕'}
-                      </span>
                       {isSoldOut ? (
                         <div className="absolute inset-0 bg-black/75 z-10 flex items-center justify-center">
                           <span className="px-2.5 py-1 rounded-full bg-red-600 text-white font-extrabold text-[10px] uppercase tracking-wider shadow">
@@ -462,7 +458,7 @@ export const POSView: React.FC = () => {
                       ) : (
                         prod.variants &&
                         prod.variants.length > 0 && (
-                          <div className="absolute bottom-2 right-2 z-10 px-2 py-0.5 rounded-md bg-black/60 text-white font-bold text-[10px] backdrop-blur-sm">
+                          <div className="absolute bottom-2 right-2 z-10 px-2 py-0.5 rounded-md bg-black/70 text-white font-bold text-[10px] backdrop-blur-sm border border-white/10">
                             {prod.variants.length} Sizes
                           </div>
                         )

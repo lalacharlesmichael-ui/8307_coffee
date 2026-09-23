@@ -45,6 +45,7 @@ import {
   syncSettingsToFirestore,
   syncDiscountToFirestore,
   deleteDiscountFromFirestore,
+  clearAllOrdersFromFirestore,
   COLLECTIONS,
 } from '../lib/firestoreSync';
 import { db, isFirebaseConfigured } from '../lib/firebase';
@@ -156,6 +157,7 @@ interface StoreContextType {
 
   // System Utilities
   resetToSampleData: () => void;
+  clearAllOrders: () => void;
   getLowStockItems: () => InventoryItem[];
 }
 
@@ -1100,6 +1102,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return inventory.filter((item) => item.current_stock <= item.min_stock_alert);
   };
 
+  const clearAllOrders = async () => {
+    setOrders([]);
+    await clearAllOrdersFromFirestore();
+    logActivity('Clear Sales Data', 'Admin cleared all sales report history and orders data.');
+  };
+
   const resetToSampleData = () => {
     setSettings(INITIAL_SHOP_SETTINGS);
     setCategories(INITIAL_CATEGORIES);
@@ -1201,6 +1209,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         logActivity,
 
         resetToSampleData,
+        clearAllOrders,
         getLowStockItems,
       }}
     >

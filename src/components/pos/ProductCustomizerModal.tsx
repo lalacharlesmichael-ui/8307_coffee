@@ -61,7 +61,7 @@ export const ProductCustomizerModal: React.FC<ProductCustomizerModalProps> = ({
         {/* Header */}
         <div className="p-5 bg-gradient-to-r from-[#3D2314] to-[#2A180D] text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#D97706]/20 border border-[#8C5338] flex items-center justify-center text-2xl shadow overflow-hidden relative">
+            <div className="w-12 h-12 rounded-2xl bg-[#D97706]/20 border border-[#8C5338] flex items-center justify-center text-2xl shadow overflow-hidden relative shrink-0">
               {product.image_url ? (
                 <img
                   src={product.image_url}
@@ -72,7 +72,6 @@ export const ProductCustomizerModal: React.FC<ProductCustomizerModalProps> = ({
                   }}
                 />
               ) : null}
-              <span>{product.emoji_icon || '☕'}</span>
             </div>
             <div>
               <h3 className="text-lg font-extrabold text-white">{product.name}</h3>
